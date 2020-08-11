@@ -59,7 +59,7 @@ class PhotoController {
         photo.contactId = contactId
         try {
             await photo.save()
-            res.status(200).json(response('success', 'photo updated'))
+            res.status(200).json(response('success', 'photo updated', photo))
         } catch (error) {
             res.status(500).json(response('fail', 'failed updating photo'))
         }
