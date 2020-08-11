@@ -8,7 +8,6 @@ const response = {
 
 class CommentController{
         static async saveComment(req, res) {
-            // res.json(req.body)
             req.body.contactId = req.userId
             try {
                 const save = await Comment.create({...req.body});
@@ -24,8 +23,8 @@ class CommentController{
 
           static async updateComment(req, res){
             const { id } = req.params;
-            const { content, photoId, contactId } = req.body;
-            const getComment = await Comment.update({ content, photoId, contactId },
+            req.body.contactId = req.userId
+            const getComment = await Comment.update({ ...req.body },
             {
                 where: {
                     id: id
@@ -46,14 +45,14 @@ class CommentController{
         }
             static async deleteComment(req, res){
                 const { id } = req.params;
-                const delComment = await Comment.destroy({ where: {
-                id: id
-                }});
+                const delComment = await Comment.destroy({ 
+                    where: {
+                        id: id
+                    }
+                });
 
                 try {
                     if (delComment) {
-                    const dataComment = await Comment.findAll({});
-                    response.data = dataComment;
                     response.message = "Delete succes";
                     res.status(200).json(response);
                 }
@@ -89,19 +88,25 @@ class CommentController{
 
             static async getCommentId(req, res) {
                 const { id } = req.params;
-                const comment = await Comment.findByPk(id);
+                const comment = await Comment.findOne({
+                    where: { id: id },
+                    include: [
+                        { model: Photo, as: 'photo' },
+                        { model: User, as: 'user' },
+                    ]
+                });
                 try {
-                if (!comment) throw new Error("Comment not found");
-                response.data = comment;
-                response.status = "success";
-                res.json(response);
+                    if (!comment) throw new Error("Comment not found");
+                    response.data = comment;
+                    response.status = "success";
+                    res.json(response);
                 } catch (error) {
-                response.message = error.message;
-                response.data = {};
-                response.status = "fail";
-                res.status(404).json(response);
-            }
-        } 
+                    response.message = error.message;
+                    response.data = {};
+                    response.status = "fail";
+                    res.status(404).json(response);
+                }
+            } 
 
     }        
     module.exports = CommentController;
