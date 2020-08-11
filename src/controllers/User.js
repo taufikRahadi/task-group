@@ -41,7 +41,7 @@ class Controller {
         try {
             const data = await models.User.findAll({ attributes: ["username", "email", "fullname"],
                 include: [
-                    { model: models.Photo, include: { model: models.Comment } }
+                    { model: models.Photo}, { model: models.Comment } 
                 ]
             });
             response.data = data
@@ -63,7 +63,7 @@ class Controller {
             }
             const data =  await models.User.findByPk(req.userId, {
                 include: [ 
-                    { model: models.Photo, include: { model: models.Comment } }
+                    { model: models.Photo}, { model: models.Comment }
                 ]
             })
             response.data = data;
