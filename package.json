@@ -5,6 +5,9 @@
   "repository": "git@github.com:taufikRahadi/task-group.git",
   "author": "Taufik Rahadi <taufikrahadi1@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
   "dependencies": {
     "bcrypt": "^5.0.0",
     "cloudinary": "^1.22.0",
