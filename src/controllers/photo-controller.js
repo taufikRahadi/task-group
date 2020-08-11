@@ -1,12 +1,14 @@
-const { Photo, User } = require('../models')
+const { Photo, User, Comment } = require('../models')
 const response = require('../helpers/response')
+const destroy = require('../helpers/cloudinary-delete')
 
 class PhotoController {
     static async index (req, res) {
         try {
             const photos = await Photo.findAll({
                 include: [
-                    { model: User, as: 'user' }
+                    { model: User, as: 'user' },
+                    { model: Comment, as: 'comment' }
                 ]
             })
             res.status(200).json(response('success', 'photos data', photos))
@@ -16,14 +18,10 @@ class PhotoController {
     }
 
     static async store (req, res) {
-        const file = req.file.path
-        const { caption, contactId } = req.body
+        req.body.url = req.file.path
+        req.body.contactId = req.userId
         try {
-            const photo = await Photo.create({
-                caption: caption,
-                url: file,
-                contactId: contactId
-            },)
+            const photo = await Photo.create({ ...req.body })
             res.status(201).json(response('success', 'photo saved & uploaded', photo))
         } catch (error) {
             res.status(500).json(response('fail', error))
@@ -49,14 +47,13 @@ class PhotoController {
 
     static async update (req, res) {
         const photo = await Photo.findByPk(req.params.id)
-        const { caption, contactId } = req.body
         if(!photo) return res.status(404).json(response('fail', 'photo not found'))
 
         if (req.file) {
             photo.url = req.file.path
         }
-        photo.caption = caption
-        photo.contactId = contactId
+        photo.caption = req.body.caption
+        photo.contactId = req.userId
         try {
             await photo.save()
             res.status(200).json(response('success', 'photo updated', photo))
