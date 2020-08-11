@@ -1,4 +1,4 @@
-const { Comment } = require('../models')
+const { Comment, User, Photo } = require('../models')
 
 const response = {
     message: "Your Message",
@@ -8,19 +8,16 @@ const response = {
 
 class CommentController{
         static async saveComment(req, res) {
-            const { content, photoId, contactId } = req.body;
+            // res.json(req.body)
+            req.body.contactId = req.userId
             try {
-                const save = await Comment.create({
-                content: content,
-                photoId: photoId,
-                contactId: contactId
-                });
+                const save = await Comment.create({...req.body});
                 response.data = save;
                 response.message = "Succes save data";
                 res.status(201).json(response);
             } catch (error) {
                 res.data = [];
-                response.message = "failed save data";
+                response.message = error.message;
                 res.status(400).json(response);
             }
         }
@@ -68,7 +65,12 @@ class CommentController{
         }
             static async getComment(req, res){
             try {
-                const allData = await Comment.findAll({});
+                const allData = await Comment.findAll({
+                    include: [
+                        { model: Photo, as: 'photo' },
+                        { model: User, as: 'user' },
+                    ]
+                });
                 if (allData.length !== 0) {
                     response.data = allData;
                     response.message = "succes"
