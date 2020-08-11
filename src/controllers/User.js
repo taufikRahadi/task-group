@@ -66,7 +66,11 @@ class Controller {
             //         { model: models.Post, include: { model: models.Comment } }
             //     ]
             // })
-            const data =  await models.User.findByPk(req.params.id)
+            const data =  await models.User.findByPk(req.params.id, {
+                include: [ 
+                    { model: models.Post, include: { model: models.Comment } }
+                ]
+            })
             response.data = data;
             response.message = "Data successfully retrieved";
             response.status = "Success"
