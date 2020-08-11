@@ -10,7 +10,7 @@ const auth = require('./src/middleware/auth')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use('/users', userRoute)
+app.use('/users', auth, userRoute)
 app.use('/photos', auth, photoRoute)
 app.use('/auth', authRoute)
 
