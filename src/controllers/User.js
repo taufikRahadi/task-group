@@ -39,9 +39,9 @@ class Controller {
 
     static async read(req, res) {
         try {
-            const data = await models.User.findAll({ attributes: ["username", "email", "fullname"] }, {
+            const data = await models.User.findAll({ attributes: ["username", "email", "fullname"],
                 include: [
-                    { model: models.Post, include: { model: models.Comment } }
+                    { model: models.Photo, include: { model: models.Comment } }
                 ]
             });
             response.data = data
@@ -58,17 +58,12 @@ class Controller {
 
     static async find(req, res) {
         try {
-            // if (req.params.id != req.user.id) {
-            //     return res.status(401).json("You are not the user")
-            // }
-            // const data =  await models.Author.findByPk(req.user.id, {
-            //     include: [
-            //         { model: models.Post, include: { model: models.Comment } }
-            //     ]
-            // })
-            const data =  await models.User.findByPk(req.params.id, {
+            if (req.params.id != req.userId) {
+                return res.status(401).json("You are not the user")
+            }
+            const data =  await models.User.findByPk(req.userId, {
                 include: [ 
-                    { model: models.Post, include: { model: models.Comment } }
+                    { model: models.Photo, include: { model: models.Comment } }
                 ]
             })
             response.data = data;
@@ -85,10 +80,13 @@ class Controller {
 
     static async update(req, res) {
         try {
-            const data = await models.User.findByPk(req.params.id)
+            if (req.params.id != req.userId) {
+                return res.status(401).json("You are not the user")
+            }
+            const data = await models.User.findByPk(req.userId)
             await models.User.update(req.body, {
                 where: {
-                    id: req.params.id,
+                    id: req.userId,
                 },
             })
             response.data = {
@@ -112,18 +110,13 @@ class Controller {
 
     static async delete(req, res) {
         try {
-            // if (req.params.id != req.user.id) {
-            //     return res.status(401).json("You are not the user")
-            // }
-            // await models.Author.destroy({
-            //     where: {
-            //         id: req.user.id,
-            //     }   
-            // })
-            const data = await models.User.findByPk(req.params.id)
-            await models.User.destroy({
+            if (req.params.id != req.userId) {
+                return res.status(401).json("You are not the user")
+            }
+            const data = await models.User.findByPk(req.userId)
+            await models.Author.destroy({
                 where: {
-                    id: req.params.id,
+                    id: req.user.id,
                 }   
             })
             response.data = null
