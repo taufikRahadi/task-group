@@ -1,6 +1,5 @@
 const { Photo, User, Comment } = require('../models')
 const response = require('../helpers/response')
-const destroy = require('../helpers/cloudinary-delete')
 
 class PhotoController {
     static async index (req, res) {
